@@ -6,6 +6,7 @@ module Headshift
       super
       
       @steps = {}
+      @examples = {}
     end
     
     def before_step(*args)
@@ -31,21 +32,56 @@ module Headshift
     def after_features(*args)
       puts
       puts "======================="
-      print_formatted_steps(@steps)
+      print_formatted_hash(@steps)
+      puts
+      print_formatted_hash(@examples)
     end
     
-    def print_formatted_steps(steps, sort_by=:avg_time, limit=20)
+    def scenario_name(keyword, name, file_colon_line, source_indent)
+      @scenario_file_colon_line = file_colon_line
+    end
+    
+    def before_examples(examples)
+      @processing_examples = true
+    end
+    
+    def after_examples(examples)
+      @processing_examples = false
+    end
+    
+    def before_table_row(table_row)
+      if @processing_examples
+        @ts = Time.now
+      end
+    end
+    
+    def after_table_row(table_row)
+      if @processing_examples
+        time = Time.now - @ts
+        key = @scenario_file_colon_line.sub(/\d+$/, table_row.line.to_s)
+        
+        if @examples.has_key? key
+          # Incremental average time: http://jvminside.blogspot.com/2010/01/incremental-average-calculation.html
+          @examples[key][:avg_time] += (time - @examples[key][:avg_time]) / @examples[key][:count]
+          @examples[key][:count] += 1
+        else
+          @examples[key] = {:count => 1, :avg_time => time}
+        end
+      end
+    end
+    
+    def print_formatted_hash(hash, sort_by=:avg_time, limit=20)
       key_width = count_width = avg_time_width = 0
-      steps.each do |key, value|
+      hash.each do |key, value|
         key_width = [key_width, key.length].max
         count_width = [count_width, value[:count].to_s.length].max
         avg_time_width = [avg_time_width, ("%.6f" % value[:avg_time]).length].max
       end
       
-      sorted_steps = steps.sort {|x,y| x[1][:avg_time] <=> y[1][:avg_time]}
+      sorted_hash = hash.sort {|x,y| x[1][:avg_time] <=> y[1][:avg_time]}
       
       puts "| #{"Step".ljust(key_width)} | #{"#".ljust(count_width)} | #{"Avg Time".ljust(avg_time_width)} |"
-      sorted_steps.reverse[0..limit].each do |step|
+      sorted_hash.reverse[0..limit].each do |step|
         puts "| #{step[0].ljust(key_width)} | #{step[1][:count].to_s.ljust(count_width)} | #{("%.6f" % step[1][:avg_time]).ljust(avg_time_width)} |"
       end
     end
