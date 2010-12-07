@@ -82,7 +82,7 @@ module Headshift
         tot_time_width = [tot_time_width, ("%.6f" % value[:tot_time]).length].max
       end
       
-      sorted_hash = hash.sort {|x,y| x[1][:avg_time] <=> y[1][:avg_time]}
+      sorted_hash = hash.sort {|x,y| x[1][sort_by] <=> y[1][sort_by]}
       
       puts "| #{"Step".ljust(key_width)} | #{"#".ljust(count_width)} | #{"Avg Time".ljust(avg_time_width)} | #{"Tot Time".ljust(tot_time_width)} |"
       sorted_hash.reverse[0..limit].each do |step|
