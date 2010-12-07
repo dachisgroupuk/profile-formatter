@@ -17,12 +17,14 @@ module Headshift
       if status == :passed
         time = Time.now - @timestamp
         key = step_match.file_colon_line
+        
         if @steps.has_key? key
           # Incremental average time: http://jvminside.blogspot.com/2010/01/incremental-average-calculation.html
-          @steps[key][:avg_time] += (time - @steps[key][:avg_time]) / @steps[key][:count]
           @steps[key][:count] += 1
+          @steps[key][:avg_time] += (time - @steps[key][:avg_time]) / @steps[key][:count]
+          @steps[key][:tot_time] += time
         else
-          @steps[key] = {:count => 1, :avg_time => time}
+          @steps[key] = {:count => 1, :avg_time => time, :tot_time => time}
         end
       end
       
@@ -62,27 +64,29 @@ module Headshift
         
         if @examples.has_key? key
           # Incremental average time: http://jvminside.blogspot.com/2010/01/incremental-average-calculation.html
-          @examples[key][:avg_time] += (time - @examples[key][:avg_time]) / @examples[key][:count]
           @examples[key][:count] += 1
+          @examples[key][:avg_time] += (time - @examples[key][:avg_time]) / @examples[key][:count]
+          @steps[key][:tot_time] += time
         else
-          @examples[key] = {:count => 1, :avg_time => time}
+          @examples[key] = {:count => 1, :avg_time => time, :tot_time => time}
         end
       end
     end
     
     def print_formatted_hash(hash, sort_by=:avg_time, limit=20)
-      key_width = count_width = avg_time_width = 0
+      key_width = count_width = avg_time_width = tot_time_width = 0
       hash.each do |key, value|
         key_width = [key_width, key.length].max
         count_width = [count_width, value[:count].to_s.length].max
         avg_time_width = [avg_time_width, ("%.6f" % value[:avg_time]).length].max
+        tot_time_width = [tot_time_width, ("%.6f" % value[:tot_time]).length].max
       end
       
       sorted_hash = hash.sort {|x,y| x[1][:avg_time] <=> y[1][:avg_time]}
       
-      puts "| #{"Step".ljust(key_width)} | #{"#".ljust(count_width)} | #{"Avg Time".ljust(avg_time_width)} |"
+      puts "| #{"Step".ljust(key_width)} | #{"#".ljust(count_width)} | #{"Avg Time".ljust(avg_time_width)} | #{"Tot Time".ljust(tot_time_width)} |"
       sorted_hash.reverse[0..limit].each do |step|
-        puts "| #{step[0].ljust(key_width)} | #{step[1][:count].to_s.ljust(count_width)} | #{("%.6f" % step[1][:avg_time]).ljust(avg_time_width)} |"
+        puts "| #{step[0].ljust(key_width)} | #{step[1][:count].to_s.ljust(count_width)} | #{("%.6f" % step[1][:avg_time]).ljust(avg_time_width)} | #{("%.6f" % step[1][:tot_time]).ljust(tot_time_width)} |"
       end
     end
   end
