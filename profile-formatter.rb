@@ -45,6 +45,8 @@ module Headshift
     
     def before_examples(examples)
       @processing_examples = true
+      @processing_title_row = true
+      @outline_file_colon_line = @scenario_file_colon_line
     end
     
     def after_examples(examples)
@@ -59,16 +61,20 @@ module Headshift
     
     def after_table_row(table_row)
       if @processing_examples
-        time = Time.now - @ts
-        key = @scenario_file_colon_line.sub(/\d+$/, table_row.line.to_s)
+        unless @processing_title_row
+          time = Time.now - @ts
+          key = @outline_file_colon_line
         
-        if @examples.has_key? key
-          # Incremental average time: http://jvminside.blogspot.com/2010/01/incremental-average-calculation.html
-          @examples[key][:count] += 1
-          @examples[key][:avg_time] += (time - @examples[key][:avg_time]) / @examples[key][:count]
-          @steps[key][:tot_time] += time
+          if @examples.has_key? key
+            # Incremental average time: http://jvminside.blogspot.com/2010/01/incremental-average-calculation.html
+            @examples[key][:count] += 1
+            @examples[key][:avg_time] += (time - @examples[key][:avg_time]) / @examples[key][:count]
+            @examples[key][:tot_time] += time
+          else
+            @examples[key] = {:count => 1, :avg_time => time, :tot_time => time}
+          end
         else
-          @examples[key] = {:count => 1, :avg_time => time, :tot_time => time}
+          @processing_title_row = false
         end
       end
     end
