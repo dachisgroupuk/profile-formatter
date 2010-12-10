@@ -7,6 +7,7 @@ module Headshift
       
       @steps = {}
       @examples = {}
+      @failures = []
     end
     
     def before_step(*args)
@@ -26,6 +27,8 @@ module Headshift
         else
           @steps[key] = {:count => 1, :avg_time => time, :tot_time => time}
         end
+      elsif status == :failed
+        @failures << @scenario_file_colon_line
       end
       
       super
@@ -37,6 +40,13 @@ module Headshift
       print_formatted_hash(@steps, "Steps")
       puts
       print_formatted_hash(@examples, "Examples")
+      unless @failures.empty?
+        puts "======================="
+        puts "Failing Scenarios:"
+        @failures.each do |failure|
+          puts "cucumber #{failure}"
+        end
+      end
     end
     
     def scenario_name(keyword, name, file_colon_line, source_indent)
