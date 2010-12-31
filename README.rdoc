@@ -1,0 +1,22 @@
+= profile-formatter
+
+A Cucumber output formatter that outputs profiling information
+
+== Installation
+
+  $ gem install profile-formatter
+
+== Usage
+
+  $ cucumber --format Headshift::ProfileFormatter
+
+== Building the gem
+
+  $ rake gemspec
+  $ gem build profile-formatter.gemspec
+
+== Copyright
+
+Copyright (c) 2010 Alessandro Morandi. See LICENSE.txt for
+further details.
+

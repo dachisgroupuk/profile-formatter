@@ -89,7 +89,7 @@ module Headshift
       end
     end
     
-    def print_formatted_hash(hash, title, sort_by=:avg_time, limit=20)
+    def print_formatted_hash(hash, title, sort_by=:tot_time, limit=20)
       key_width = title.length
       count_width = avg_time_width = tot_time_width = 0
       hash.each do |key, value|
