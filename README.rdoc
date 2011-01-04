@@ -10,6 +10,30 @@ A Cucumber output formatter that outputs profiling information
 
   $ cucumber --format Headshift::ProfileFormatter
 
+== Output
+
+The output will be something similar to:
+
+  | Steps                                                | # | Avg Time | Tot Time |
+  | features/step_definitions/group_member_steps.rb:6    | 1 | 0.561732 | 0.561732 |
+  | features/step_definitions/shared_document_steps.rb:1 | 1 | 0.363284 | 0.363284 |
+  ...
+  
+  | Examples                                          | #  | Avg Time | Tot Time  |
+  | features/webtrends_tracking_for_groups.feature:35 | 31 | 2.096895 | 65.003736 |
+  | features/webtrends_tracking_for_groups.feature:75 | 8  | 2.377968 | 19.023741 |
+  ...
+
+The output lists the steps and the Scenario Outlines that are called during the tests.
+It will show how many times each step or outline has been called, the average time for a single call and the total time for all the calls.
+The lists are sorted according to the total time and only the first 20 lines are shown, though both those options can be changed.
+
+== Issues
+
+The sorting order and the number of results shown in the output can only be configured from the code, at the moment.
+The formatter is supposed to be working against a passing test suite. Test failures may interfere in the profiling and not be reported clearly.
+Steps are not tracked correctly when they belong to scenario outlines: a step which is called 5 times from 5 examples will just be reported as a single call (this is the reason why examples profiling is reported separately).
+
 == Building the gem
 
   $ rake gemspec
