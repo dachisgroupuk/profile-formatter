@@ -14,6 +14,10 @@ module Headshift
       @timestamp = Time.now
     end
     
+    def before_features(*args)
+      @start_time = Time.now
+    end
+    
     def after_step_result(keyword, step_match, multiline_arg, status, exception, source_indent, background)
       if status == :passed
         time = Time.now - @timestamp
@@ -37,6 +41,8 @@ module Headshift
     def after_features(*args)
       puts
       puts "======================="
+      puts "#{@steps.count} steps and #{@examples.count} examples executed in #{Time.at(Time.now - @start_time).gmtime.strftime("%Hh %Mm %Ss")}"
+      puts
       print_formatted_hash(@steps, "Steps")
       puts
       print_formatted_hash(@examples, "Examples")
