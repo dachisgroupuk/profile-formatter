@@ -16,8 +16,8 @@ Jeweler::Tasks.new do |gem|
   gem.version = "0.1"
   gem.homepage = "http://github.com/headshift/profile-formatter"
   gem.license = "MIT"
-  gem.summary = %Q{A Cucumber output formatter that outputs profiling information}
-  gem.description = %Q{A Cucumber output formatter that outputs profiling information about the time it takes to run steps and examples}
+  gem.summary = %Q{A Cucumber output formatter providing profiling information}
+  gem.description = %Q{A Cucumber output formatter providing profiling information about the time it takes to run steps and examples}
   gem.email = "alessandro@headshift.com"
   gem.authors = ["Alessandro Morandi"]
   gem.add_dependency "cucumber", ">= 0.4"
